@@ -119,14 +119,14 @@ def fill_monster(mon_arr):
     for nm in range(len(new_monsters)):
         if new_monsters[nm] != num:
             if num != 0:
-                real_new_monsters.append(num)
                 real_new_monsters.append(cnt)
+                real_new_monsters.append(num)
             num = new_monsters[nm]
             cnt = 1
         else:
             cnt += 1
-    real_new_monsters.append(num)
     real_new_monsters.append(cnt)
+    real_new_monsters.append(num)
     d = 1
     e = 0
     x, y = px, py - 1
@@ -136,7 +136,7 @@ def fill_monster(mon_arr):
         for j in range(arr[i]):
             new_pan[x][y] = real_new_monsters[e]
             e += 1
-            if e > len(real_new_monsters):
+            if e == len(real_new_monsters):
                 pan = new_pan[:]
                 return
             x, y = x + dx, y + dy
