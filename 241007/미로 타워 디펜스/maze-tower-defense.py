@@ -44,11 +44,11 @@ def find_monster():
     array = []
     d = 1
     x, y = px, py - 1
-    flag = False
     for i in range(1, len(arr)):
         dx, dy = directions[direction[d]]
         for j in range(arr[i]):
-            array.append((x, y))
+            if pan[x][y] != 0:
+                array.append((x, y))
             x, y = x + dx, y + dy
         d = (d+1)%4
     return array
@@ -59,13 +59,8 @@ def push_monster(monsters):
     cnt = 0
     num = -1
     poped = []
-    zeros = []
     real_poped = []
     for x, y in monsters:
-        if pan[x][y] == 0:
-            zeros.append((x, y))
-            continue
-
         if pan[x][y] != num:
             if cnt >= 4:
                 score += num * cnt
@@ -84,9 +79,6 @@ def push_monster(monsters):
         for gx, gy in poped:
             real_poped.append((gx, gy))
     for x, y in real_poped:
-        monsters.remove((x, y))
-
-    for x, y in zeros:
         monsters.remove((x, y))
 
     return monsters, score
@@ -109,16 +101,29 @@ def re_monster(mons):
                 return
             x, y = x + dx, y + dy
         d = (d+1)%4
+    pan = new_pan[:]
+
 
 def fill_monster(mon_arr):
     global pan
 
     new_monsters = []
-
     for rx, ry in mon_arr:
-        for ma in range(pan[rx][ry]):
-            new_monsters.append(ma)
-
+        new_monsters.append(pan[rx][ry])
+    real_new_monsters = []
+    num = 0
+    cnt = 0
+    for nm in range(len(new_monsters)):
+        if new_monsters[nm] != num:
+            if num != 0:
+                real_new_monsters.append(num)
+                real_new_monsters.append(cnt)
+            num = new_monsters[nm]
+            cnt = 1
+        else:
+            cnt += 1
+    real_new_monsters.append(num)
+    real_new_monsters.append(cnt)
 
     d = 1
     e = 0
@@ -127,13 +132,15 @@ def fill_monster(mon_arr):
     for i in range(1, len(arr)):
         dx, dy = directions[direction[d]]
         for j in range(arr[i]):
-            new_pan[x][y] = new_monsters[e]
+            new_pan[x][y] = real_new_monsters[e]
             e += 1
-            if e == len(new_monsters):
+            if e == len(real_new_monsters):
+                pan = new_pan[:]
                 return
             x, y = x + dx, y + dy
         d = (d+1)%4
     pan = new_pan[:]
+
 
 N, turn = map(int, input().split())
 pan = [list(map(int, input().split())) for _ in range(N)]
@@ -160,10 +167,10 @@ for _ in range(turn):
         mon = find_monster()
         m, s = push_monster(mon)
         answer += s
-        if not s:
+        if s == 0 or not m:
             break
         re_monster(m)
-
-
     fill_monster(m)
+
+
 print(answer)
