@@ -108,38 +108,37 @@ def re_monster(mons):
 
 
 def fill_monster(mon_arr):
+    global pan
+
     new_monsters = []
     for rx, ry in mon_arr:
         new_monsters.append(pan[rx][ry])
-
     real_new_monsters = []
     num = 0
     cnt = 0
     for nm in range(len(new_monsters)):
         if new_monsters[nm] != num:
             if num != 0:
-                real_new_monsters.append(cnt)
                 real_new_monsters.append(num)
+                real_new_monsters.append(cnt)
             num = new_monsters[nm]
             cnt = 1
         else:
             cnt += 1
-    real_new_monsters.append(cnt)
     real_new_monsters.append(num)
-
+    real_new_monsters.append(cnt)
     d = 1
     e = 0
     x, y = px, py - 1
-    new_pan = [[0 for _ in range(len(pan))] for _ in range(len(pan))]
+    new_pan = [[0 for _ in range(N)] for _ in range(N)]
     for i in range(1, len(arr)):
         dx, dy = directions[direction[d]]
         for j in range(arr[i]):
-            if e < len(real_new_monsters):
-                new_pan[x][y] = real_new_monsters[e]
-                e += 1
+            new_pan[x][y] = real_new_monsters[e]
+            e += 1
             x, y = x + dx, y + dy
         d = (d+1)%4
-    return new_pan
+    pan = new_pan[:]
 
 
 N, turn = map(int, input().split())
@@ -170,7 +169,7 @@ for _ in range(turn):
         if s == 0 or not m:
             break
         re_monster(m)
-    pan = fill_monster(m if m else [])
+    fill_monster(m if m else [])
 
 
 print(answer)
