@@ -26,7 +26,18 @@ n x n으로 이뤄진 나선형 미로 속에 1번, 2번, 3번 몬스터들이 �
 
 d는 0번부터 3번까지 각각 → ↓ ← ↑으로 주어집니다.
 """
+def attack(attack_direction, attack_range):
+    cnt = 0
+    dx, dy = directions[attack_direction]
+    # 넘어 가지는 않음
+    x, y = px, py
+    for _ in range(attack_range):
+        x += dx
+        y += dy
 
+        cnt += pan[x][y]
+        pan[x][y] = 0
+    return cnt
 
 
 def find_monster():
@@ -59,7 +70,6 @@ def push_monster(monsters):
             num = pan[x][y]
             poped = []
             poped.append((x, y))
-
         else:
             cnt += 1
             poped.append((x, y))
@@ -67,24 +77,14 @@ def push_monster(monsters):
         score += num * cnt
         for gx, gy in poped:
             real_poped.append((gx, gy))
+
+    # 실제로 제거된 좌표를 monsters 리스트에서 제거
     for x, y in real_poped:
         monsters.remove((x, y))
+        pan[x][y] = 0  # 좌표값을 0으로 초기화
 
     return monsters, score
 
-
-def attack(attack_direction, attack_range):
-    cnt = 0
-    dx, dy = directions[attack_direction]
-    # 넘어 가지는 않음
-    x, y = px, py
-    for _ in range(attack_range):
-        x += dx
-        y += dy
-        if 0 <= x < N and 0 <= y < N:  # 격자 범위 체크
-            cnt += pan[x][y]
-            pan[x][y] = 0
-    return cnt
 
 
 def re_monster(mons):
@@ -97,54 +97,49 @@ def re_monster(mons):
     for i in range(1, len(arr)):
         dx, dy = directions[direction[d]]
         for j in range(arr[i]):
-            if k < len(mons):  # 격자 범위 초과 방지
-                new_pan[x][y] = pan[mons[k][0]][mons[k][1]]
-                k += 1
+            new_pan[x][y] = pan[mons[k][0]][mons[k][1]]
+            k += 1
             if k == len(mons):
                 pan = new_pan[:]
                 return
             x, y = x + dx, y + dy
-        d = (d + 1) % 4
+        d = (d+1)%4
     pan = new_pan[:]
 
 
-
 def fill_monster(mon_arr):
-    global pan
-
     new_monsters = []
     for rx, ry in mon_arr:
         new_monsters.append(pan[rx][ry])
+
     real_new_monsters = []
     num = 0
     cnt = 0
     for nm in range(len(new_monsters)):
         if new_monsters[nm] != num:
             if num != 0:
-                real_new_monsters.append(num)
                 real_new_monsters.append(cnt)
+                real_new_monsters.append(num)
             num = new_monsters[nm]
             cnt = 1
         else:
             cnt += 1
-    real_new_monsters.append(num)
     real_new_monsters.append(cnt)
+    real_new_monsters.append(num)
 
     d = 1
     e = 0
     x, y = px, py - 1
-    new_pan = [[0 for _ in range(N)] for _ in range(N)]
+    new_pan = [[0 for _ in range(len(pan))] for _ in range(len(pan))]
     for i in range(1, len(arr)):
         dx, dy = directions[direction[d]]
         for j in range(arr[i]):
-            new_pan[x][y] = real_new_monsters[e]
-            e += 1
-            if e == len(real_new_monsters):
-                pan = new_pan[:]
-                return
+            if e < len(real_new_monsters):
+                new_pan[x][y] = real_new_monsters[e]
+                e += 1
             x, y = x + dx, y + dy
         d = (d+1)%4
-    pan = new_pan[:]
+    return new_pan
 
 
 N, turn = map(int, input().split())
@@ -175,7 +170,7 @@ for _ in range(turn):
         if s == 0 or not m:
             break
         re_monster(m)
-    fill_monster(m)
+    pan = fill_monster(m if m else [])
 
 
 print(answer)
