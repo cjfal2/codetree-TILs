@@ -137,7 +137,7 @@ def fill_monster(mon_arr):
             new_pan[x][y] = real_new_monsters[e]
             e += 1
             if e == len(real_new_monsters):
-                pan = new_pan[:]
+                pan = new_pan
                 return
             x, y = x + dx, y + dy
         d = (d+1)%4
