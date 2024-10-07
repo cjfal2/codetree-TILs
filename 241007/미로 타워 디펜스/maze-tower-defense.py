@@ -26,18 +26,7 @@ n x n으로 이뤄진 나선형 미로 속에 1번, 2번, 3번 몬스터들이 �
 
 d는 0번부터 3번까지 각각 → ↓ ← ↑으로 주어집니다.
 """
-def attack(attack_direction, attack_range):
-    cnt = 0
-    dx, dy = directions[attack_direction]
-    # 넘어 가지는 않음
-    x, y = px, py
-    for _ in range(attack_range):
-        x += dx
-        y += dy
 
-        cnt += pan[x][y]
-        pan[x][y] = 0
-    return cnt
 
 
 def find_monster():
@@ -84,6 +73,20 @@ def push_monster(monsters):
     return monsters, score
 
 
+def attack(attack_direction, attack_range):
+    cnt = 0
+    dx, dy = directions[attack_direction]
+    # 넘어 가지는 않음
+    x, y = px, py
+    for _ in range(attack_range):
+        x += dx
+        y += dy
+        if 0 <= x < N and 0 <= y < N:  # 격자 범위 체크
+            cnt += pan[x][y]
+            pan[x][y] = 0
+    return cnt
+
+
 def re_monster(mons):
     global pan
 
@@ -94,14 +97,16 @@ def re_monster(mons):
     for i in range(1, len(arr)):
         dx, dy = directions[direction[d]]
         for j in range(arr[i]):
-            new_pan[x][y] = pan[mons[k][0]][mons[k][1]]
-            k += 1
+            if k < len(mons):  # 격자 범위 초과 방지
+                new_pan[x][y] = pan[mons[k][0]][mons[k][1]]
+                k += 1
             if k == len(mons):
                 pan = new_pan[:]
                 return
             x, y = x + dx, y + dy
-        d = (d+1)%4
+        d = (d + 1) % 4
     pan = new_pan[:]
+
 
 
 def fill_monster(mon_arr):
