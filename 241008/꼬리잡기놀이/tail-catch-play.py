@@ -25,22 +25,24 @@ n개의 열이 주어진다고 했을 때 공이 던져지는 선은 다음과 �
 각 팀이 획득한 점수의 총합을 구하는 프로그램을 구하세요.
 """
 def move_head():
+    print(k)
     visited = [[0 for _ in range(N)] for _ in range(N)]
     for _ in range(M):
         n, m = heads.pop(0)
-        four_two = 0
+        four_three = 0
         nx, ny = 0, 0
         for dx, dy in directions:
             nnx, nny = n + dx, m + dy
-            if 0 <= nnx < N and 0 <= nny < N and pan[nnx][nny] in [4, 2]:
+            if 0 <= nnx < N and 0 <= nny < N and pan[nnx][nny] in [4, 3]:
                 if pan[nnx][nny] == 4:
-                    four_two = 4
-                    nx, ny = nnx, nny
-                if pan[nnx][nny] == 2 and four_two == 0:
-                    four_two = 2
+                    four_three = 4
                     nx, ny = nnx, nny
 
-        if four_two == 4:
+                if pan[nnx][nny] == 3 and four_three == 0:
+                    four_three = 3
+                    nx, ny = nnx, nny
+
+        if four_three == 4:
             pan[nx][ny], pan[n][m] = 1, 4
             visited[nx][ny] = 1
             visited[n][m] = 1
@@ -63,28 +65,16 @@ def move_head():
                 else:
                     break
 
-        elif four_two == 2:
+        elif four_three == 3:
             pan[nx][ny], pan[n][m] = 1, 2
             visited[nx][ny] = 1
             visited[n][m] = 1
             heads.append((nx, ny))
-            flag = True
-            while flag:
-                for dx, dy in directions:
-                    nx, ny = n + dx, m + dy
-                    if 0 <= nx < N and 0 <= ny < N and 1 < pan[nx][ny] < 4 and not visited[nx][ny]:
-                        if pan[nx][ny] == 3:
-                            flag = False
-                            pan[n][m], pan[nx][ny] = 3, 2
-                            visited[nx][ny] = 1
-                            break
-
-                        visited[nx][ny] = 1
-                        n, m = nx, ny
-                        break
-                else:
+            for dx, dy in directions:
+                nnx, nny = nx + dx, ny + dy
+                if 0 <= nnx < N and 0 <= nny < N and 1 < pan[nnx][nny] < 4 and not visited[nnx][nny]:
+                    pan[nnx][nny] = 3
                     break
-
 
 
 def throw_ball(round):
@@ -115,14 +105,20 @@ def throw_ball(round):
                 if pan[i][j] == 1:
                     score += visited[i][j] ** 2
                     ox, oy = i, j
+
                 if pan[i][j] == 3:
                     tx, ty = i, j
-                    if (i, j) != (x, y):
-                        continue
+
 
                 for dx, dy in directions:
                     nx, ny = i + dx, j + dy
                     if N > nx >= 0 and N > ny >= 0 and not visited[nx][ny] and 0 < pan[nx][ny] < 4:
+                        if pan[i][j] == 3 and pan[nx][ny] == 1:
+                            continue
+
+                        if pan[i][j] == 1 and pan[nx][ny] == 3:
+                            continue
+
                         visited[nx][ny] = visited[i][j] + 1
                         q.append((nx, ny))
             break
@@ -137,7 +133,6 @@ def throw_ball(round):
         pan[tx][ty], pan[ox][oy] = 1, 3
         heads.remove((ox, oy))
         heads.append((tx, ty))
-
     return score
 
 
