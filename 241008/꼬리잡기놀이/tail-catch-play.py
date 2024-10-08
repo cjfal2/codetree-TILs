@@ -58,13 +58,17 @@ def move_head():
 def throw_ball(round):
     global d, bx, by, s
 
+    if (round - 1) % N == 0 and round != 1:
+        s = (s+1) % 4
+    else:
+        sx, sy = directions[s]
+        bx += sx
+        by += sy
+
+    dx, dy = directions[d]
     if round % N == 0:
         d = (d+1) % 4
-        s = (s+1) % 4
-    dx, dy = directions[d]
-    sx, sy = directions[s]
-    bx += sx
-    by += sy
+
     x, y = bx, by
     score = 0
     while 1:
