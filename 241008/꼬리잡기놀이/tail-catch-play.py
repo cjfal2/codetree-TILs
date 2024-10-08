@@ -69,10 +69,6 @@ def throw_ball(round):
     score = 0
     while 1:
         if 0 < pan[x][y] < 4:
-            if pan[x][y] == 1:
-                score += 1
-                break
-
             visited = [[0 for _ in range(N)] for _ in range(N)]
             visited[x][y] = 1
             q = [(x, y)]
