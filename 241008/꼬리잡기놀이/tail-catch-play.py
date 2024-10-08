@@ -28,31 +28,63 @@ def move_head():
     visited = [[0 for _ in range(N)] for _ in range(N)]
     for _ in range(M):
         n, m = heads.pop(0)
+        four_two = 0
+        nx, ny = 0, 0
         for dx, dy in directions:
-            nx, ny = n + dx, m + dy
-            if 0 <= nx < N and 0 <= ny < N and pan[nx][ny] == 4:
-                pan[nx][ny], pan[n][m] = 1, 4
-                visited[nx][ny] = 1
-                visited[n][m] = 1
-                heads.append((nx, ny))
-                flag = True
-                while flag:
-                    for dx, dy in directions:
-                        nx, ny = n + dx, m + dy
-                        if 0 <= nx < N and 0 <= ny < N and 1 < pan[nx][ny] < 4 and not visited[nx][ny]:
-                            if pan[nx][ny] == 3:
-                                flag = False
-                                pan[n][m], pan[nx][ny] = 3, 4
-                                visited[nx][ny] = 1
-                                break
+            nnx, nny = n + dx, m + dy
+            if 0 <= nnx < N and 0 <= nny < N and pan[nnx][nny] in [4, 2]:
+                if pan[nnx][nny] == 4:
+                    four_two = 4
+                    nx, ny = nnx, nny
+                if pan[nnx][nny] == 2 and four_two == 0:
+                    four_two = 2
+                    nx, ny = nnx, nny
 
-                            pan[n][m], pan[nx][ny] = 2, 4
+        if four_two == 4:
+            pan[nx][ny], pan[n][m] = 1, 4
+            visited[nx][ny] = 1
+            visited[n][m] = 1
+            heads.append((nx, ny))
+            flag = True
+            while flag:
+                for dx, dy in directions:
+                    nx, ny = n + dx, m + dy
+                    if 0 <= nx < N and 0 <= ny < N and 1 < pan[nx][ny] < 4 and not visited[nx][ny]:
+                        if pan[nx][ny] == 3:
+                            flag = False
+                            pan[n][m], pan[nx][ny] = 3, 4
                             visited[nx][ny] = 1
-                            n, m = nx, ny
                             break
-                    else:
+
+                        pan[n][m], pan[nx][ny] = 2, 4
+                        visited[nx][ny] = 1
+                        n, m = nx, ny
                         break
-                break
+                else:
+                    break
+
+        elif four_two == 2:
+            pan[nx][ny], pan[n][m] = 1, 2
+            visited[nx][ny] = 1
+            visited[n][m] = 1
+            heads.append((nx, ny))
+            flag = True
+            while flag:
+                for dx, dy in directions:
+                    nx, ny = n + dx, m + dy
+                    if 0 <= nx < N and 0 <= ny < N and 1 < pan[nx][ny] < 4 and not visited[nx][ny]:
+                        if pan[nx][ny] == 3:
+                            flag = False
+                            pan[n][m], pan[nx][ny] = 3, 2
+                            visited[nx][ny] = 1
+                            break
+
+                        visited[nx][ny] = 1
+                        n, m = nx, ny
+                        break
+                else:
+                    break
+
 
 
 def throw_ball(round):
@@ -85,6 +117,8 @@ def throw_ball(round):
                     ox, oy = i, j
                 if pan[i][j] == 3:
                     tx, ty = i, j
+                    if (i, j) != (x, y):
+                        continue
 
                 for dx, dy in directions:
                     nx, ny = i + dx, j + dy
