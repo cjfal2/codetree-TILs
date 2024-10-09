@@ -40,16 +40,17 @@ def move_golem(y, where_exit, turn):
     golem = [(x, y)]
     for dx, dy in directions:
         golem.append((x + dx, y + dy))
-    while_turn = 0
     flag = True
 
     check_rl = 0
 
+    temp_golem = golem[:]
+    temp_exit = where_exit
+
     while flag:
-        while_turn += 1
         new_golem = []
         # 남쪽으로 이동
-        for x, y in golem:
+        for x, y in temp_golem:
             new_golem.append((x+1, y))
         # 남쪽 가능한지 체크
         for x, y in new_golem:
@@ -63,15 +64,17 @@ def move_golem(y, where_exit, turn):
                     break
         else:
             # 남쪽 가능한거임
-            golem = list(tuple(new_golem))
+            temp_golem = list(tuple(new_golem))
+            golem = temp_golem[:]
             check_rl = 1
+            where_exit = temp_exit
             continue
 
 
-        if golem[0][0] != N-2 and check_rl == 1:
+        if temp_golem[0][0] != N-2:
             # 서쪽으로 이동
             new_golem.clear()
-            for x, y in golem:
+            for x, y in temp_golem:
                 new_golem.append((x, y-1))
 
             # 서쪽 가능한지 체크
@@ -85,16 +88,37 @@ def move_golem(y, where_exit, turn):
                     break
             else:
                 # 서쪽 가능한거임
-                golem = list(tuple(new_golem))
-                where_exit = (where_exit - 1) % 4
+                temp_golem = list(tuple(new_golem))
+                temp_exit = (temp_exit - 1) % 4
                 check_rl = 2
-                continue
+                # 남쪽으로 이동
+                new_golem.clear()
+                for x, y in temp_golem:
+                    new_golem.append((x + 1, y))
+                # 남쪽 가능한지 체크
+                for x, y in new_golem:
+                    if x < 0:
+                        continue
+                    else:
+                        if 0 <= x < N and 0 <= y < M:
+                            if pan[x][y]:
+                                break
+                        else:
+                            break
+                else:
+                    # 남쪽 가능한거임
+                    temp_golem = list(tuple(new_golem))
+                    golem = temp_golem[:]
+                    check_rl = 1
+                    where_exit = temp_exit
+                    continue
 
 
-        if golem[0][0] != N - 2:
+
+        if temp_golem[0][0] != N - 2:
             # 동쪽으로 이동
             new_golem.clear()
-            for x, y in golem:
+            for x, y in temp_golem:
                 new_golem.append((x, y + 1))
 
             # 동쪽 가능한지 체크
@@ -108,10 +132,31 @@ def move_golem(y, where_exit, turn):
                     break
             else:
                 # 동쪽 가능한거임
-                golem = list(tuple(new_golem))
-                where_exit = (where_exit + 1) % 4
+                temp_golem = list(tuple(new_golem))
+                temp_exit = (temp_exit + 1) % 4
                 check_rl = 3
-                continue
+                # 남쪽으로 이동
+                new_golem.clear()
+                for x, y in temp_golem:
+                    new_golem.append((x + 1, y))
+                # 남쪽 가능한지 체크
+                for x, y in new_golem:
+                    if x < 0:
+                        continue
+                    else:
+                        if 0 <= x < N and 0 <= y < M:
+                            if pan[x][y]:
+                                break
+                        else:
+                            break
+                else:
+                    # 남쪽 가능한거임
+                    temp_golem = list(tuple(new_golem))
+                    golem = temp_golem[:]
+                    check_rl = 1
+                    where_exit = temp_exit
+                    continue
+
 
 
         # 아무것도 못한다면 나갔는지 판단후 pan에 저장
@@ -154,7 +199,7 @@ def check_score():
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
             if 0 <= nx < N and 0 <= ny < M and visited[nx][ny] == 0:
-                if now_num < 0: # 여기가 출구라면, 0 아니면 갈 수 있음
+                if now_num < 0: # 여기가 출구라면, 0 아니면 갈 수 있음?
                     if 0 != pan[nx][ny]:
                         visited[nx][ny] = 1
                         max_hang = max(max_hang, nx+1)
@@ -183,5 +228,5 @@ for k in range(1, K+1):
     #     print(*p)
     # print("=============")
     answer += check_score()
-    # print(answer)
+
 print(answer)
