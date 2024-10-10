@@ -58,30 +58,38 @@ def crash(who, santa_number, crash_dx, crash_dy):
         new_santa_y += crash_dy
     # 탈락 판단
     if 0 <= new_santa_x < N and 0 <= new_santa_y < N:
-        # 상호작용 여부 판단
         santas[santa_number]["where"] = (new_santa_x, new_santa_y)
-        temp_where_santa, temp_dict_santa = get_where_santas(santa_number)
-        if (new_santa_x, new_santa_y) in temp_where_santa:  # 산타set에 이동한 좌표가 있으면
-            # 부딪힌 산타가 그 방향으로 밀려나야 함
-            crashed_santa_x, crashed_santa_y = new_santa_x, new_santa_y
-            crashed_santa_num = temp_dict_santa[(crashed_santa_x, crashed_santa_y)]
-            while 1:  # 계속 밀려남
-                crashed_santa_x += crash_dx
-                crashed_santa_y += crash_dy
-                if (crashed_santa_x, crashed_santa_y) in temp_where_santa:
-                    continue
-                else:
-                    # 밀려난 산타가 넘어갔는지 확인
-                    if 0 <= crashed_santa_x < N and 0 <= crashed_santa_y < N:
-                        # 밀려난 산타 자리 저장
-                        santas[crashed_santa_num]["where"] = (crashed_santa_x, crashed_santa_y)
-                    else:
-                        # 넘어가서 탈락
-                        santas[crashed_santa_num]["alive"] = False
-                    break  # 계속 밀려남 을 break
+        # 상호작용 여부 판단
+        while santa_number != -1:
+            santa_number, new_santa_x, new_santa_y = push_santa(santa_number, new_santa_x, new_santa_y, crash_dx, crash_dy)
+            if santa_number != -1:
+                santas[santa_number]["where"] = (new_santa_x, new_santa_y)
     else:
         # 넘어가서 탈락
         santas[santa_number]["alive"] = False
+
+
+def push_santa(push_santa_number, push_x, push_y, dx, dy):
+    temp_where_santa, temp_dict_santa = get_where_santas(push_santa_number)
+    if (push_x, push_y) in temp_where_santa:  # 산타set에 이동한 좌표가 있으면
+        # 부딪힌 산타가 그 방향으로 밀려나야 함
+        crashed_santa_x, crashed_santa_y = push_x, push_y
+        crashed_santa_num = temp_dict_santa[(crashed_santa_x, crashed_santa_y)]
+        crashed_santa_x += dx
+        crashed_santa_y += dy
+        if (crashed_santa_x, crashed_santa_y) in temp_where_santa:
+            return crashed_santa_num, crashed_santa_x, crashed_santa_y
+        else:
+            # 밀려난 산타가 넘어갔는지 확인
+            if 0 <= crashed_santa_x < N and 0 <= crashed_santa_y < N:
+                # 밀려난 산타 자리 저장
+                santas[crashed_santa_num]["where"] = (crashed_santa_x, crashed_santa_y)
+                return crashed_santa_num, crashed_santa_x, crashed_santa_y
+            else:
+                # 넘어가서 탈락
+                santas[crashed_santa_num]["alive"] = False
+                return -1, -1, -1
+    return -1, -1, -1
 
 
 def move_santa():
@@ -92,6 +100,7 @@ def move_santa():
             continue
         x, y = value["where"]
         now_distance = cal_distance(dear_x, dear_y, x, y)
+
         temp_santa_go = []  # (거리, 방향, dx, dy)
         # 1.산타는 루돌프에게 거리가 가장 가까워지는 방향으로 1칸 이동합니다.
         for d in range(4):
@@ -126,18 +135,6 @@ def heal_santas_and_get_alive_score():
                     value["stun"] = 0  # 기절 풀어줌
 
 
-def print_santas():
-    pan = [[0 for _ in range(N)] for _ in range(N)]
-    pan[dear_x][dear_y] = "*"
-    for key, value in santas.items():
-        if value["alive"]:
-            x, y = value["where"]
-            pan[x][y] = key + 1
-
-    for p in pan:
-        print(*p)
-    print("========############=========")
-
 # 첫 번째 줄에 N, M, P, C, D가 공백을 사이에 두고 주어집니다.
 N, M, P, C, D = map(int, input().split())
 dear_x, dear_y = map(lambda x: int(x)-1, input().split())
@@ -148,7 +145,6 @@ ttt = []
 for _ in range(P):
     number_santa, xxx, yyy = map(lambda x: int(x)-1, input().split())
     ttt.append((number_santa, xxx, yyy))
-
 ttt.sort()
 for number_santa, xxx, yyy in ttt:
     santas[number_santa] = {
@@ -157,14 +153,10 @@ for number_santa, xxx, yyy in ttt:
         "stun": 0,
         "score": 0
     }
-
 dear_directions = [
     (1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)
 ]  # 8방향
-
-
 santa_directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]  # 상우하좌
-
 for mmm in range(1, M+1):
     move_dear()
     move_santa()
