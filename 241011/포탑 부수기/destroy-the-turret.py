@@ -7,6 +7,10 @@ def set_attacker_target(turn):
         a_nm_sum = -sum(tower_place)
         a_m = -tower_place[1]
         candidate.append((a_attack, a_when, a_nm_sum, a_m, tower_place))
+
+    if len(candidate) <= 1:
+        return (-1, -1), (-1, -1)
+
     candidate.sort()
 
     a_where = candidate[0][-1]
@@ -29,11 +33,11 @@ def layzer_attack(ax, ay, tx, ty):
                 if (nx, ny) == (tx, ty):
                     for route in routes:
                         towers[route]["attack"] -= half_damage
-                    return routes
+                    return routes, True
 
                 visited[nx][ny] = 1
                 q.append((nx, ny, routes + [(nx, ny)]))
-    return []  # 레이저 공격 실패
+    return [], False  # 레이저 공격 실패
 
 
 def bomb_attack(ax, ay, tx, ty):
@@ -82,7 +86,6 @@ for v in range(N):
         if temp[w]:
             towers[(v, w)] = {
                 "attack": temp[w],
-                "score": 0,
                 "when": 0
             }
             where_tower.add((v, w))
@@ -90,12 +93,15 @@ for v in range(N):
 
 for k in range(1, K + 1):
     attacker, target = set_attacker_target(k)
+    if attacker == target:
+        break
+
     damage = towers[attacker]["attack"]
     half_damage = damage // 2
     towers[target]["attack"] -= damage  # 공격 대상은 공격자 공격력 만큼의 피해를 받습니다.
 
-    attacked_route = layzer_attack(*attacker, *target)
-    if not attacked_route:
+    attacked_route, flag = layzer_attack(*attacker, *target)
+    if not attacked_route and not flag:
         # 레이저 루트가 없을 때 포탄 공격
         attacked_route = bomb_attack(*attacker, *target)
     attacked_route.extend([attacker, target])
