@@ -1,20 +1,3 @@
-"""
-choose_cube()
-
-    90도씩 회전
-    rotate_cube()
-
-    bfs로 점수
-    get_score()
-
-    최종반영
-
-이후 반복
-get_score()
-remove_cell()
-fill_cell()
-
-"""
 from copy import deepcopy
 
 
@@ -100,34 +83,19 @@ pan = [list(map(int, input().split())) for _ in range(5)]
 num_lists = list(map(int, input().split()))
 answers = []
 for turn in range(K):
-    # print("#####################################################")
     answer = 0
     getted_score, _, _, _, will_romove, rotated_pan = choose_cube()  # 점수, 돌아간 수, 열, 행, 꼭지점, 돌아간 temp판
     if getted_score == 0:
         break
-#     print(getted_score, will_romove, rotated_pan)
     pan = rotated_pan
-#     for p in pan:
-#         print(*p)
-#     print("````````````````````")
     remove_cell(will_romove)
     fill_cell()
     answer -= getted_score
-#     for p in pan:
-#         print(*p)
-#     print("````````````````````")
-#     print(answer)
     while getted_score:
         getted_score, will_romove = get_score_bfs(pan)
-#         print("!@!!!", getted_score)
         answer += getted_score
         remove_cell(will_romove)
         fill_cell()
-#         for p in pan:
-#             print(*p)
-#         print("````````````````````")
-#         print(answer)
-#     print(answer,"!@#$!@#$!@#$!@#$")
     answers.append(answer)
 
 print(*answers)
