@@ -60,6 +60,9 @@ def breed_trees():
         breed_num = len(temp_breed)
         if breed_num:
             breed_amount = tree_amount // breed_num
+            if breed_amount == 0:
+                continue
+
             for breed_where in temp_breed:
                 if breed_where in new_trees:
                     new_trees[breed_where] += breed_amount
@@ -162,7 +165,7 @@ for n in range(N):
 for mmmmmmm in range(M):
     if not trees_place:
         break
-    # print(f"-------------------턴:{mmmmmmm}-----------------------")
+#     print(f"-------------------턴:{mmmmmmm}-----------------------")
     grow_trees()
 #     print_tree(f"{mmmmmmm}, 성장")
     breed_trees()
