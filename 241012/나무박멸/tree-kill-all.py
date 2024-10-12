@@ -70,6 +70,9 @@ def breed_trees():
 
 
 def kill_trees():
+    if not trees_place:
+        return 0, set()
+
     temp_kill_trees = []  # [-박멸 나무 수, r, c]
     temp_kill_trees_info = dict()
     for tree_where, value in trees_place.items():
