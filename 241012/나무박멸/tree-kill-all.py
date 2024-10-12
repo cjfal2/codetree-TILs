@@ -84,9 +84,13 @@ def kill_trees():
             for _ in range(K):
                 nx += dx
                 ny += dy
-                if N > nx >= 0 and N > ny >= 0 and (nx, ny) not in walls and (nx, ny) in trees_place:
-                    killing_tree += trees_place[(nx, ny)]
-                    temp_kill.add((nx, ny))
+                if N > nx >= 0 and N > ny >= 0 and (nx, ny) not in walls:
+                    if (nx, ny) in trees_place:
+                        killing_tree += trees_place[(nx, ny)]
+                        temp_kill.add((nx, ny))
+                    else:
+                        temp_kill.add((nx, ny))
+                        break
                 else:
                     break
         temp_kill_trees.append((-killing_tree, r, c))
@@ -103,7 +107,8 @@ def kill_trees():
 
 def killar_adjust(killar_where):
     for kx, ky in killar_where:
-        trees_place.pop((kx, ky))
+        if (kx, ky) in trees_place:
+            trees_place.pop((kx, ky))
         killar[(kx, ky)] = 1
 
     temp = set()
@@ -114,6 +119,28 @@ def killar_adjust(killar_where):
 
     for key in temp:
         killar.pop(key)
+
+
+def print_tree(what):
+    print(f"{what}################")
+    pan = [["0" for _ in range(N)] for _ in range(N)]
+    for x, y in walls:
+        pan[x][y] = "*"
+
+    for x, y in killar.keys():
+        pan[x][y] = "K"
+
+    # print("tree")
+    for k, v in trees_place.items():
+        # print(k, ":", v)
+        pan[k[0]][k[1]] = str(v)
+    # print("killar")
+    for k, v in killar.items():
+        pan[k[0]][k[1]] = str(-v)
+        # print(k, ":", v)
+    for p in pan:
+        print(p)
+    print("============================")
 
 
 # 첫 번째 줄에 격자의 크기 n, 박멸이 진행되는 년 수 m, 제초제의 확산 범위 k, 제초제가 남아있는 년 수 c
@@ -131,11 +158,19 @@ for n in range(N):
             walls.add((n, m))
         elif temp_map[m] > 0:
             trees_place[(n, m)] = temp_map[m]
-
+# print_tree("원래")
 for mmmmmmm in range(M):
+    if not trees_place:
+        break
+    # print(f"-------------------턴:{mmmmmmm}-----------------------")
     grow_trees()
+#     print_tree(f"{mmmmmmm}, 성장")
     breed_trees()
+#     print_tree(f"{mmmmmmm}, 번식")
     s, info = kill_trees()
     answer += s
     killar_adjust(info)
+#     print_tree(f"{mmmmmmm}, 죽임")
+#     print(answer)
+#     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print(answer)
