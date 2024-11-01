@@ -9,7 +9,7 @@ const coins = [7, 5, 2, 1];
 let pointer = 0;
 let answer = 0;
 
-while (N > 0 || pointer < 4) {
+while (N > 0) {
     const coin = coins[pointer];
     if (N >= coin) {
         N -= coin
