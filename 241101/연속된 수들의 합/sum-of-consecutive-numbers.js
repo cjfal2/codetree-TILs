@@ -23,7 +23,7 @@ const sumOfRange = (s, e) => {
     return sum
 }
 
-let answer = 1
+let answer = N === 1 ? 0 : 1
 while (left < right) {
     const tempSum = sumOfRange(left, right);
     if (tempSum === N) {
