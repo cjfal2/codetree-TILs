@@ -16,6 +16,7 @@ const input = (() => {
 const backSetting = () => {
     const N = parseInt(input());
     const numbers = input().split(" ").map(Number);
+    numbers.sort((a, b) => a - b);
     const result = [];
     const nowNumbers = [];
 
