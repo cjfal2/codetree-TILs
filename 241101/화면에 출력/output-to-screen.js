@@ -15,18 +15,20 @@ const input = (() => {
 const S = parseInt(input());
 const q = [[1, 0, 0]];
 const visited = new Set();
-visited.add([1, 0, 0]);
+visited.add("1,0");
+
 while (q.length > 0) {
   const [screen, clipboard, time] = q.shift();
+
   if (screen === S) {
     console.log(time);
     break;
   }
-  for (const [s, c, t] of [[screen, screen, time + 1], [screen + clipboard, clipboard, time + 1], [screen - 1, clipboard, time + 1]]) {
-    if (visited.has([s, c, t])) {
-      continue;
+
+  for (const [s, c] of [[screen, screen], [screen + clipboard, clipboard], [screen - 1, clipboard]]) {
+    if (s >= 0 && s <= 2 * S && !visited.has(`${s},${c}`)) {
+      visited.add(`${s},${c}`);
+      q.push([s, c, time + 1]);
     }
-    visited.add([s, c, t]);
-    q.push([s, c, t]);
   }
 }
