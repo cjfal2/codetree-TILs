@@ -6,17 +6,15 @@ const input = (() => {
 
 let N = parseInt(input());
 const coins = [7, 5, 2, 1];
-let pointer = 0;
-let answer = 0;
+const dp = Array(N + 1).fill(Infinity);
+dp[0] = 0;
 
-while (N > 0) {
-    const coin = coins[pointer];
-    if (N >= coin) {
-        N -= coin
-        answer += 1
-    }
-    else {
-        pointer++
+for (let i = 1; i <= N; i++) {
+    for (let coin of coins) {
+        if (i >= coin) {
+            dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+        }
     }
 }
-console.log(answer);
+
+console.log(dp[N]);
