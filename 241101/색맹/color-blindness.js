@@ -59,7 +59,7 @@ const gr = () => {
                     if (0 > ny) continue;
                     if (visitedGr[nx][ny]) continue;
                     const tempColor = pan[nx][ny] === "B" ? "B" : "R";
-                    if (pan[nx][ny] !== tempColor) continue;
+                    if (color !== tempColor) continue;
                     visitedGr[nx][ny] = true;
                     q.push([nx, ny])
                 }
